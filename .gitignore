@@ -2,9 +2,11 @@
 bin/
 obj/
 
-# Папки и файлы, создаваемые Visual Studio Code
+# Папки и файлы, хранящие непубличные данные
 appsettings.Development.json
 appsettings.Production.json
+# deploy.sh
+# NotAPidorBot.service
 
 # Папки и файлы, создаваемые Visual Studio Code
 .vscode/

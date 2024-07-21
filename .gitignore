@@ -1,0 +1,17 @@
+# Папки и файлы, создаваемые Visual Studio Code
+bin/
+obj/
+
+# Папки и файлы, создаваемые Visual Studio Code
+appsettings.Development.json
+appsettings.Production.json
+
+# Папки и файлы, создаваемые Visual Studio Code
+.vscode/
+.history/
+*.code-workspace
+
+# Конфигурационные файлы для macOS
+.DS_Store
+.AppleDouble
+.LSOverride

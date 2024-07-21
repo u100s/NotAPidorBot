@@ -1,8 +1,8 @@
 [Unit]
 Description=NotAPidorBot
 [Service]
-WorkingDirectory=/path/to/your/app
-ExecStart=/usr/bin/dotnet /path/to/your/app/YourApp.dll
+WorkingDirectory=/home/NotAPidorBot
+ExecStart=/usr/bin/dotnet /home/NotAPidorBot/NotAPidorBot.dll
 Restart=always
 RestartSec=10
 SyslogIdentifier=notapidorbot

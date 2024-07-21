@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Переменные
-PROJECT_PATH="/path/to/your/project"
-REMOTE_USER="your_remote_user"
-REMOTE_HOST="your_remote_host"
-REMOTE_PORT="your_port"
-REMOTE_DIRECTORY="/path/to/remote/directory"
-SERVICE_NAME="YourServiceName"
+# Подключение файла с переменными
+source ./deploy_config.sh
 
 # Сборка проекта
 dotnet build $PROJECT_PATH -c Release

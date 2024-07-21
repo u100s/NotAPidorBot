@@ -27,12 +27,12 @@ if [ $? -ne 0 ]; then
 fi
 
 # Перезапуск сервиса на удалённом сервере
-# ssh $REMOTE_USER@$REMOTE_HOST "sudo systemctl restart $SERVICE_NAME"
+ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo systemctl restart $SERVICE_NAME"
 
 # Проверка успешности перезапуска
-# if [ $? -ne 0 ]; then
-#   echo "Перезапуск сервиса не удался"
-#   exit 1
-# fi
+if [ $? -ne 0 ]; then
+   echo "Перезапуск сервиса не удался"
+   exit 1
+fi
 
 echo "Сборка и публикация успешно завершены"

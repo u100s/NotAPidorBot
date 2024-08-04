@@ -2,6 +2,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using NotAPidorBot.Helpers;
+using Telegram.Bot.Requests;
 
 namespace NotAPidorBot.Models.GPTReactions;
 public class ChatGptReaction : ReactionBase
@@ -16,6 +17,7 @@ public class ChatGptReaction : ReactionBase
         " бот, "
     };
     internal override string[] Substrings { get { return _substrings; } }
+    private string _initPrompt = "You are my great friend. Your name is Nepidorasy Sergeevich. From Moscow, but recently moved to Germany. We have known each other for a long time, you are free in expression, you can use slang, you can swear, especially if it’s funny. We communicate without greetings. Answer briefly, in Russian. ";
 
     private Reply[] _replies = new[]
     {
@@ -33,20 +35,33 @@ public class ChatGptReaction : ReactionBase
     };
     internal override Reply[] Replies { get { return _replies; } }
 
-    private string _question = "";
+    private GptContext? _context = null;
 
     public override bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
     {
-        if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Length < 100)
+        if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Length < 256)
         {
+            if (msg.IsItReplyToBotMessage())
+            {
+                _context = GptContextStore.GetContextByMessage(msg);
+                if (_context != null)
+                {
+                    _context.AddMessage(msg);
+                    return true;
+                }
+            }
+
             foreach (var substring in Substrings)
             {
                 if (msg.Text.StartsWith(substring))
                 {
-                    _question = msg.Text.RemoveFirstOccurrence(substring);
-                    if (_question.Length > 6)
+                    var question = msg.Text.RemoveFirstOccurrence(substring);
+                    if (question.Length > 6)
+                    {
+                        question = _initPrompt + question.CapitalizeFirstLetter();
+                        _context = GptContextStore.AddNewContext(question, msg.MessageId);
                         return true;
-                    else _question = "";
+                    }
                 }
             }
         }
@@ -55,20 +70,26 @@ public class ChatGptReaction : ReactionBase
 
     public override async Task<Message> SendAsync(ITelegramBotClient bot, ILogger logger, Message msg)
     {
-        if (msg == null || String.IsNullOrWhiteSpace(msg.Text))
+        if (msg == null || string.IsNullOrWhiteSpace(msg.Text))
         {
             throw new ArgumentException("Original message is empty or null.");
         }
 
-        if (!String.IsNullOrWhiteSpace(_question))
+        if (_context != null)
         {
             var client = new ChatGptClient(Settings.BotConfiguration.ChatGptApiKey);
 
             try
             {
                 await bot.SendChatActionAsync(msg.Chat, ChatAction.Typing);
-                string response = await client.SendMessageAsync(_question);
-                return await bot.SendReplyTextAsync(logger, msg, response);
+                if (_context != null)
+                {
+                    string response = await client.SendMessagesContextAsync(_context);
+                    var replyMessage = await bot.SendReplyTextAsync(logger, msg, response);
+                    _context.AddMessage(replyMessage, true);
+                    return replyMessage;
+                }
+                return await bot.SendReplyTextAsync(logger, msg, "Что-то наебнулось, бля");
             }
             catch (Exception ex)
             {
@@ -77,5 +98,4 @@ public class ChatGptReaction : ReactionBase
         }
         return null;
     }
-
 }

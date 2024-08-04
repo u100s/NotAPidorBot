@@ -40,4 +40,13 @@ public static class BotHelpers
         var reply = replies[randomIndex];
         return await bot.SendReplyTextAsync(logger, msg, reply);
     }
+
+    public static bool IsItReplyToBotMessage(this Message msg)
+    {
+        return msg != null &&
+            msg.ReplyToMessage != null &&
+            msg.ReplyToMessage.From != null &&
+            msg.ReplyToMessage.From.IsBot &&
+            msg.ReplyToMessage.From.Username == Settings.BotConfiguration.BotUserName;
+    }
 }

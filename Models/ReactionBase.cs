@@ -25,11 +25,7 @@ public abstract class ReactionBase
 
     public virtual bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
     {
-        if (MustBeReply &&
-            (msg.ReplyToMessage == null ||
-            msg.ReplyToMessage.From == null ||
-            !msg.ReplyToMessage.From.IsBot ||
-            msg.ReplyToMessage.From.Username != Settings.BotConfiguration.BotUserName))
+        if (MustBeReply && !msg.IsItReplyToBotMessage())
         {
             return false;
         }

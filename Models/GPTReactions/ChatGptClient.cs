@@ -8,30 +8,23 @@ namespace NotAPidorBot.Models.GPTReactions;
 public class ChatGptClient
 {
     private static readonly HttpClient httpClient = new HttpClient();
-    private readonly string apiKey;
+    private readonly string _apiKey;
 
     public ChatGptClient(string apiKey)
     {
-        this.apiKey = apiKey;
+        this._apiKey = apiKey;
     }
 
-    public async Task<string> SendMessageAsync(string message)
+    public async Task<string> SendMessagesContextAsync(GptContext context)
     {
-        string prompt = "You are my great friend. Your name is Nepidorasy Sergeevich. From Moscow, but recently moved to Germany. We have known each other for a long time, you are free in expression, you can use slang, you can swear, especially if it’s funny. We communicate without greetings. Answer briefly, in Russian.";
         var requestUri = "https://api.openai.com/v1/chat/completions";
-        var requestBody = new
-        {
-            model = "gpt-4o",
-            max_tokens = 256,
-            messages = new[] { new { role = "user", content = new[] { new { type = "text", text = prompt + message } } } },
-            temperature = 1
-        };
+        var requestBody = new ChatGPTRequestBody(context);
 
         var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
         var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
 
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
 
         var response = await httpClient.PostAsync(requestUri, content);
 
@@ -52,6 +45,8 @@ public class ChatGptClient
         }
     }
 }
+
+
 
 public class ChatGptResponse
 {

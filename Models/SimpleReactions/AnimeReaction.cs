@@ -1,19 +1,19 @@
 using Telegram.Bot.Types.Enums;
 
-namespace NotAPidorBot.Models;
-public class OnimeReaction : ReactionBase
+namespace NotAPidorBot.Models.SimpleReactions;
+public class AnimeReaction : ReactionBase
 {
     private string[] _substrings = new[]
     {
-        "ониме",
-        "онеме",
+        "аниме",
+        "анеме",
     };
     internal override string[] Substrings { get { return _substrings; } }
 
     private Reply[] _replies = new[]
     {
-        new Reply("ониме-хуяниме"),
-        new Reply("хуониме")
+        new Reply("аниме-хуяниме"),
+        new Reply("хуяниме")
     };
     internal override Reply[] Replies { get { return _replies; } }
 

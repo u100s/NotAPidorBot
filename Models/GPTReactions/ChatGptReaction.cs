@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using NotAPidorBot.Helpers;
 
-namespace NotAPidorBot.Models;
+namespace NotAPidorBot.Models.GPTReactions;
 public class ChatGptReaction : ReactionBase
 {
     private string[] _substrings = new[]

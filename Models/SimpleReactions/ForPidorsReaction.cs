@@ -7,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace NotAPidorBot.Models;
+namespace NotAPidorBot.Models.SimpleReactions;
 public class ForPidorsReaction : ReactionBase
 {
     public override int Probability { get; internal set; } = 10;

@@ -1,6 +1,6 @@
 using Telegram.Bot.Types.Enums;
 
-namespace NotAPidorBot.Models;
+namespace NotAPidorBot.Models.SimpleReactions;
 public class WindowReaction : ReactionBase
 {
     private string[] _substrings = new[]

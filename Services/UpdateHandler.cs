@@ -96,7 +96,11 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             // Проходим по всем типам и ищем классы, наследующие ReactionBase
             foreach (Type type in types)
             {
-                if (type.Namespace == targetNamespace && type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(ReactionBase)))
+                if (!String.IsNullOrEmpty(type.Namespace) 
+                    && type.Namespace.Contains(targetNamespace) 
+                    && type.IsClass
+                    && !type.IsAbstract
+                    && type.IsSubclassOf(typeof(ReactionBase)))
                 {
                     // Создаем экземпляр класса и добавляем его в список
                     ReactionBase instance = (ReactionBase)Activator.CreateInstance(type);

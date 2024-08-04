@@ -1,19 +1,25 @@
 using NotAPidorBot.Helpers;
 using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace NotAPidorBot.Models;
 public abstract class ReactionBase
 {
     internal virtual string[]? Substrings { get; }
     internal virtual Reply[]? Replies { get; }
+
+    /// <summary>
+    /// Сообщение, на которое отвечает бот, обязательно должно быть ответом на раннее сообщение бота
+    /// </summary>
     public virtual bool MustBeReply { get; internal set; } = false;
+    /// <summary>
+    /// Фраза должна полностью соответствовать шаблону
+    /// </summary>
     public virtual bool NeedFullMatch { get; internal set; } = false;
+    /// <summary>
+    /// Вероятность отправки ответа
+    /// </summary>
     public virtual int Probability { get; internal set; } = 10;
 
 

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
+namespace NotAPidorBot.Models.GPTReactions;
 public class ChatGptClient
 {
     private static readonly HttpClient httpClient = new HttpClient();

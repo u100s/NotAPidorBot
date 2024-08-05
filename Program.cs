@@ -9,6 +9,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         // Register Bot configuration
         services.Configure<BotConfiguration>(context.Configuration.GetSection("BotConfiguration"));
+        services.Configure<CharacterConfiguration>(context.Configuration.GetSection("CharacterConfiguration"));
 
         // Register named HttpClient to benefits from IHttpClientFactory
         // and consume it with ITelegramBotClient typed client.
@@ -19,8 +20,10 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
                 {
                     BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
-                    Settings.Init(botConfiguration);
+                    CharacterConfiguration? characterConfiguration = sp.GetService<IOptions<CharacterConfiguration>>()?.Value;
                     ArgumentNullException.ThrowIfNull(botConfiguration);
+                    ArgumentNullException.ThrowIfNull(characterConfiguration);
+                    Settings.Init(botConfiguration, characterConfiguration);
                     TelegramBotClientOptions options = new(botConfiguration.BotToken);
                     return new TelegramBotClient(options, httpClient);
                 });

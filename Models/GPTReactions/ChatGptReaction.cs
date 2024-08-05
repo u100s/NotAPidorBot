@@ -17,7 +17,7 @@ public class ChatGptReaction : ReactionBase
         " бот, "
     };
     internal override string[] Substrings { get { return _substrings; } }
-    private string _initPrompt = "You are my great friend. Your name is Nepidorasy Sergeevich. From Moscow, but recently moved to Germany. We have known each other for a long time, you are free in expression, you can use slang, you can swear, especially if it’s funny. We communicate without greetings. Answer briefly, in Russian. ";
+    private string _initPrompt = "You are my great friend. Your name is Nepidorasy Sergeevich. From Moscow, but recently moved to Germany. We have known each other for a long time, you are free in expression, you can use slang, you can swear, especially if it’s funny. We communicate without greetings. Answer briefly, in Russian. Use my first name only if appropriate.";
 
     private Reply[] _replies = new[]
     {
@@ -58,7 +58,9 @@ public class ChatGptReaction : ReactionBase
                     var question = msg.Text.RemoveFirstOccurrence(substring);
                     if (question.Length > 6)
                     {
-                        question = _initPrompt + question.CapitalizeFirstLetter();
+                        var character = Settings.CharacterConfiguration.GetCharacterByUserId(msg.From.Id);
+                        var characterDescription = character != null ? character.CharacterDescription : "";
+                        question = _initPrompt + " " + characterDescription + " " + question.CapitalizeFirstLetter();
                         _context = GptContextStore.AddNewContext(question, msg.MessageId);
                         return true;
                     }
@@ -85,6 +87,10 @@ public class ChatGptReaction : ReactionBase
                 if (_context != null)
                 {
                     string response = await client.SendMessagesContextAsync(_context);
+
+                    var character = Settings.CharacterConfiguration.GetCharacterByUserId(msg.From.Id);
+                    if (character != null)
+                        response = response.Replace("%username%", character.GetRandomCharacterName());
                     var replyMessage = await bot.SendReplyTextAsync(logger, msg, response);
                     _context.AddMessage(replyMessage, true);
                     return replyMessage;
@@ -93,7 +99,7 @@ public class ChatGptReaction : ReactionBase
             }
             catch (Exception ex)
             {
-                return await bot.SendReplyTextAsync(logger, msg, ex.Message);
+                return await bot.SendReplyTextAsync(logger, msg, "Бля, чёт я перебрал с программированием и мерещится мне json: " + ex.Message);
             }
         }
         return null;

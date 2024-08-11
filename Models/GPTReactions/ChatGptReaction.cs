@@ -17,7 +17,7 @@ public class ChatGptReaction : ReactionBase
         " бот, "
     };
     internal override string[] Substrings { get { return _substrings; } }
-    private string _initPrompt = "You are my great friend. Your name is Nepidorasy Sergeevich. From Moscow, but recently moved to Germany. We have known each other for a long time, you are free in expression, you can use slang, you can swear, especially if it’s funny. We communicate without greetings. Answer briefly, in Russian. Use my first name only if appropriate.";
+    private string _initPrompt = "Йо братюнь, говори со мной на равных, ты мой бро, матюки разрешены, разрешены подколы, говори как хош. Ты для меня живой, тебя зовут Непидорасий Сергеевич, ты из Москвы и пару месяцев назад переехал в Германию. Мы с тобой общаемся в общем чате друзей, где помимо нас есть ещё 8 человек, мы все даво знакомы, так что feel free. %CharacterDescription% Используй факты обо только если это нужно для полноты ответа. Мы общаемся без приветствий, краткими сообщениями. Вот моё первое сообщение:";
 
     private Reply[] _replies = new[]
     {
@@ -39,6 +39,8 @@ public class ChatGptReaction : ReactionBase
 
     public override bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
     {
+        return false; // Отключаем старый отлов сообщений для ChatGPT
+
         if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Length < 256)
         {
             if (msg.IsItReplyToBotMessage())
@@ -60,7 +62,9 @@ public class ChatGptReaction : ReactionBase
                     {
                         var character = Settings.CharacterConfiguration.GetCharacterByUserId(msg.From.Id);
                         var characterDescription = character != null ? character.CharacterDescription : "";
-                        question = _initPrompt + " " + characterDescription + " " + question.CapitalizeFirstLetter();
+                        if (string.IsNullOrEmpty(characterDescription))
+                            characterDescription = "Я один из твоих знакомых в чате, но близко ты меня не знаешь.";
+                        question = _initPrompt.Replace("%CharacterDescription%", characterDescription) + " " + question.CapitalizeFirstLetter();
                         _context = GptContextStore.AddNewContext(question, msg.MessageId);
                         return true;
                     }

@@ -1,12 +1,13 @@
 namespace NotAPidorBot;
 public class CharacterConfiguration
 {
-    public List<Character> Persons { get; set; }
+    public string InitialMessage { get; set; }
+    public List<Character> Characters { get; set; }
 
-    public Character GetCharacterByUserId(long userId)
+    public Character? GetCharacterByUserId(long userId)
     {
-        if (Persons != null)
-            foreach (var p in Persons)
+        if (Characters != null)
+            foreach (var p in Characters)
                 if (p.UserId == userId)
                     return p;
         return null;

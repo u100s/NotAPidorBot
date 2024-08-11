@@ -1,7 +1,5 @@
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
-using Telegram.Bot;
-using NotAPidorBot.Helpers;
+using NotAPidorBot.Models.ChatGpt;
 
 namespace NotAPidorBot.Models.GPTReactions;
 public class GptContext
@@ -20,7 +18,7 @@ public class GptContext
         LastMessageId = messageId;
     }
 
-    public GptContext(Message msg)
+    public GptContext(Telegram.Bot.Types.Message msg)
     {
         Created = DateTime.Now;
         OriginalMessageId = msg.MessageId;
@@ -28,12 +26,19 @@ public class GptContext
         AddMessage(msg);
     }
 
-    public void AddMessage(Message msg, bool isAnswerFromGPT = false)
+    public void AddMessage(Telegram.Bot.Types.Message msg, bool isAnswerFromGPT = false)
     {
         if (!string.IsNullOrWhiteSpace(msg.Text))
         {
             Messages.Add(new GptMessage(msg.MessageId, msg.Text, isAnswerFromGPT));
             LastMessageId = msg.MessageId;
         }
+    }
+
+    public RequestBody GetRequestBody()
+    {
+        var result = new RequestBody();
+        result.messages = Messages.Select(m => new ChatGpt.Message(m.MessageText, m.IsAnswerFromGPT)).ToArray();
+        return result;
     }
 }

@@ -1,26 +1,22 @@
-using System;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace NotAPidorBot.Models.GPTReactions;
-public class ChatGptClient
+namespace NotAPidorBot.Models.ChatGpt;
+public class Client
 {
     private static readonly HttpClient httpClient = new HttpClient();
     private readonly string _apiKey;
 
-    public ChatGptClient(string apiKey)
+    public Client(string apiKey)
     {
         this._apiKey = apiKey;
     }
 
-    public async Task<string> SendMessagesContextAsync(GptContext context)
+    public async Task<string> SendMessagesContextAsync(RequestBody request)
     {
         var requestUri = "https://api.openai.com/v1/chat/completions";
-        var requestBody = context.GetRequestBody();
 
-        var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
+        var jsonRequestBody = JsonConvert.SerializeObject(request);
         var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
 
         httpClient.DefaultRequestHeaders.Clear();
@@ -36,34 +32,12 @@ public class ChatGptClient
         try
         {
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            var responseObject = JsonConvert.DeserializeObject<ChatGptResponse>(jsonResponse);
+            var responseObject = JsonConvert.DeserializeObject<Response>(jsonResponse);
             return responseObject.choices[0].message.content.Trim();
         }
         catch (Exception ex)
         {
             throw;
-        }
-    }
-}
-
-
-
-public class ChatGptResponse
-{
-    public string id { get; set; }
-    public string model { get; set; }
-    public string created { get; set; }
-    public Choice[] choices { get; set; }
-
-    public class Choice
-    {
-        public int index { get; set; }
-        public Message message { get; set; }
-
-        public class Message
-        {
-            public string role { get; set; }
-            public string content { get; set; }
         }
     }
 }

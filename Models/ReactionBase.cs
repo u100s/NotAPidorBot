@@ -2,6 +2,7 @@ using NotAPidorBot.Helpers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using NotAPidorBot.Models.TotalContext;
 
 namespace NotAPidorBot.Models;
 public abstract class ReactionBase
@@ -57,7 +58,11 @@ public abstract class ReactionBase
 
         var reply = Replies[randomIndex];
         if (reply.Type == MessageType.Text)
-            return await bot.SendReplyTextAsync(logger, msg, reply.Text);
+        {
+            var result = await bot.SendReplyTextAsync(logger, msg, reply.Text);
+            Context.AddAnswerFromGpt(result.MessageId, reply.Text);
+            return result;
+        }
         if (reply.Type == MessageType.Sticker)
             return await bot.SendReplyStickerAsync(logger, msg, reply.Text);
         else

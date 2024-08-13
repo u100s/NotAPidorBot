@@ -9,16 +9,11 @@ public static class Context
     private static List<Person> Persons { get; set; } = new List<Person>();
     public static List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     private static int TotalMessagesLength { get; set; } = 0;
-    private static int TotalMessagesLengthLimit { get; set; } = 1024;
+    private static int TotalMessagesLengthLimit { get; set; } = 2048;
 
     public static void AddMessage(Telegram.Bot.Types.Message msg)
     {
-        if (TotalMessagesLengthLimit < TotalMessagesLength)
-        {
-            int removedLength = Messages[0].Text.Length;
-            Messages.RemoveAt(0);
-            TotalMessagesLength -= removedLength;
-        }
+        CheckAndCleanMessageshistory();
         if (!string.IsNullOrWhiteSpace(msg.Text) && msg.From != null)
         {
             var preson = GetOrCreatePersonByUser(msg.From);
@@ -29,12 +24,7 @@ public static class Context
 
     public static void AddAnswerFromGpt(long messageId, string text)
     {
-        if (TotalMessagesLengthLimit < TotalMessagesLength)
-        {
-            int removedLength = Messages[0].Text.Length;
-            Messages.RemoveAt(0);
-            TotalMessagesLength -= removedLength;
-        }
+        CheckAndCleanMessageshistory();
         if (!string.IsNullOrWhiteSpace(text))
         {
             Messages.Add(new ChatMessage(0, messageId, text, true));
@@ -51,7 +41,18 @@ public static class Context
         return result;
     }
 
-
+    private static void CheckAndCleanMessageshistory()
+    {
+        if (TotalMessagesLengthLimit < TotalMessagesLength)
+        {
+            while (TotalMessagesLengthLimit < TotalMessagesLength)
+            {
+                int removedLength = Messages[0].Text.Length;
+                Messages.RemoveAt(0);
+                TotalMessagesLength -= removedLength;
+            }
+        }
+    }
 
     private static Person GetOrCreatePersonByUser(User user)
     {
@@ -84,6 +85,7 @@ public static class Context
         var messages = new List<ChatGpt.Message>();
         messages.Add(new ChatGpt.Message(AddCharactersDecriptionsToInitialMessage(), false));// Первое сообщение с инициализирующим промтом
         messages.AddRange(Messages.Select(m => new ChatGpt.Message(PrepareMessageTextToSendToGpt(m), m.IsAnswerFromGPT)));// Остальные сообщения из чата
+        messages.Add(new ChatGpt.Message(Settings.CharacterConfiguration.LastMessageCondition, false));// Последнее сообщение, наставляющее на ответ
         var result = new RequestBody
         {
             messages = messages.ToArray()
@@ -106,9 +108,9 @@ public static class Context
         {
             var messagePerson = FindPersonBySpeakerId(m.SpeakerId);
             if (messagePerson != null)
-                result = messagePerson.SpeakerName + " говорит: " + result;
+                result = messagePerson.SpeakerName + " пишет: " + result;
             else
-                result = "Кто-то говорит: " + result;
+                result = "Кто-то пишет: " + result;
         }
         return result;
     }
@@ -116,7 +118,7 @@ public static class Context
     private static string AddCharactersDecriptionsToInitialMessage()
     {
         var result = Settings.CharacterConfiguration.InitialMessage;
-        var charactersDesciption = "В чате присутствуют:";
+        var charactersDesciption = "В чате есть:";
         if (Persons.Count < 1)
             charactersDesciption += "ты один";
         else

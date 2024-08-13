@@ -2,6 +2,7 @@ namespace NotAPidorBot;
 public class CharacterConfiguration
 {
     public string InitialMessage { get; set; }
+    public string LastMessageCondition { get; set; }
     public List<Character> Characters { get; set; }
 
     public Character? GetCharacterByUserId(long userId)

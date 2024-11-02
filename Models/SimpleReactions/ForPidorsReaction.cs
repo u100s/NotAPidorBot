@@ -39,7 +39,7 @@ public class ForPidorsReaction : ReactionBase
     internal override Reply[] Replies { get { return _replies; } }
     private string _wordForPidors = "";
 
-    public override bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
+    public override bool CheckNeedReactionForMessage(Message msg)
     {
         // Не отвечаем на сообщения-ответы боту, т.к. там может быть команда
         if (msg.ReplyToMessage != null &&
@@ -53,7 +53,7 @@ public class ForPidorsReaction : ReactionBase
         if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Length < 100)
         {
             var random = new Random();
-            if (random.Next(0, 100) < Probability * currentRandomScore)
+            if (random.Next(0, 100) < Probability)
             {
                 var nouns = msg.Text.ExtractNouns();
                 if (nouns != null && nouns.Length > 0)

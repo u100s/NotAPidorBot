@@ -33,22 +33,25 @@ public class TotalContextReaction : ReactionBase
     };
     internal override Reply[] Replies { get { return _replies; } }
 
-    public override bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
+    public override bool CheckNeedReactionForMessage(Message msg)
     {
-        if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Length < 256)
+        if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text))
         {
             Context.AddMessage(msg);
 
             if (msg.IsItReplyToBotMessage())
                 return true;
 
-            foreach (var substring in Substrings)
+            if (msg.Text.Length < 512)
             {
-                if (msg.Text.StartsWith(substring))
+                foreach (var substring in Substrings)
                 {
-                    var question = msg.Text.RemoveFirstOccurrence(substring);
-                    if (question.Length >= 6)
-                        return true;
+                    if (msg.Text.StartsWith(substring))
+                    {
+                        var question = msg.Text.RemoveFirstOccurrence(substring);
+                        if (question.Length >= 6)
+                            return true;
+                    }
                 }
             }
         }

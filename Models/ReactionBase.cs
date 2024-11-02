@@ -24,7 +24,7 @@ public abstract class ReactionBase
     public virtual int Probability { get; internal set; } = 10;
 
 
-    public virtual bool CheckNeedReactionForMessage(Message msg, float currentRandomScore)
+    public virtual bool CheckNeedReactionForMessage(Message msg)
     {
         if (MustBeReply && !msg.IsItReplyToBotMessage())
         {
@@ -34,7 +34,7 @@ public abstract class ReactionBase
         if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text) && Substrings != null && Substrings.Length > 0)
         {
             var random = new Random();
-            if (random.Next(0, 100) < Probability * currentRandomScore)
+            if (random.Next(0, 100) < Probability)
             {
                 if (NeedFullMatch)
                     return msg.Text.EqualsAny(Substrings);

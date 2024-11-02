@@ -5,8 +5,10 @@ public class AnimeReaction : ReactionBase
 {
     private string[] _substrings = new[]
     {
-        "аниме",
-        "анеме",
+        " аниме",
+        " анеме",
+        "аниме ",
+        "анеме ",
     };
     internal override string[] Substrings { get { return _substrings; } }
 

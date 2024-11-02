@@ -10,8 +10,8 @@ public class MajorReaction : ReactionBase
         "товарищь майор",
         " мусоров",
         "майор",
-        "фсб",
-        " ментов"
+        " фсб ",
+        " ментов "
     };
     internal override string[] Substrings { get { return _substrings; } }
 

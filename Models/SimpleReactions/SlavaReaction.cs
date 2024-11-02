@@ -19,8 +19,10 @@ public class SlavaReaction : ReactionBase
         new Reply("Слався Слава!"),
         new Reply("Слово Славе"),
         new Reply("Славчик красавчик!"),
-        new Reply("Славец кросавец!"),
-        new Reply("Здрав будь боярин!")
+        new Reply("Славец кросавец!"), 
+        new Reply("Славец удалец!"),  
+        new Reply("Слава красава!"), 
+        new Reply("Славик — наш герой"+Environment.NewLine+"С ним всегда мы за одно!"+Environment.NewLine+"Славик, ты вперед иди,"+Environment.NewLine+"Победу нам всем принеси!!")
     };
     internal override Reply[] Replies { get { return _replies; } }
 

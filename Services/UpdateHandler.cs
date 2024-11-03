@@ -51,7 +51,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             return;
         }
 
-        if (msg.Type != MessageType.Text)
+        if (msg.Type != MessageType.Text && msg.Type != MessageType.Photo && msg.Type != MessageType.Video)
         {
             return;
         }

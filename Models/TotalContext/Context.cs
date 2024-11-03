@@ -1,6 +1,9 @@
 using Telegram.Bot.Types;
 using NotAPidorBot.Models.ChatGpt;
 using System.Text.RegularExpressions;
+using System;
+using Microsoft.VisualBasic;
+using System.Net.NetworkInformation;
 
 namespace NotAPidorBot.Models.TotalContext;
 public static class Context
@@ -9,16 +12,18 @@ public static class Context
     private static List<Person> Persons { get; set; } = new List<Person>();
     public static List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     private static int TotalMessagesLength { get; set; } = 0;
-    private static int TotalMessagesLengthLimit { get; set; } = 2048;
+    private static int TotalMessagesLengthLimit { get; set; } = 30000;
+    private static int LastMessagesCountForAnswer { get; set; } = 30;
 
     public static void AddMessage(Telegram.Bot.Types.Message msg)
     {
         CheckAndCleanMessageshistory();
-        if (!string.IsNullOrWhiteSpace(msg.Text) && msg.From != null)
+        string messageText = GetTextFromAnyTypeMessage(msg);
+        if (!string.IsNullOrWhiteSpace(messageText) && msg.From != null)
         {
             var preson = GetOrCreatePersonByUser(msg.From);
-            Messages.Add(new ChatMessage(preson.SpeakerId, msg.MessageId, msg.Text, false));
-            TotalMessagesLength += msg.Text.Length;
+            var forwardedFromName = GetFromTitleForForwardedMessage(msg);
+            Messages.Add(new ChatMessage(preson.SpeakerId, msg.MessageId, messageText, false, forwardedFromName));
         }
     }
 
@@ -84,7 +89,7 @@ public static class Context
     {
         var messages = new List<ChatGpt.Message>();
         messages.Add(new ChatGpt.Message(AddCharactersDecriptionsToInitialMessage(), false));// Первое сообщение с инициализирующим промтом
-        messages.AddRange(Messages.Select(m => new ChatGpt.Message(PrepareMessageTextToSendToGpt(m), m.IsAnswerFromGPT)));// Остальные сообщения из чата
+        messages.AddRange(Messages.TakeLast(LastMessagesCountForAnswer).Select(m => new ChatGpt.Message(PrepareMessageTextToSendToGpt(m), m.IsAnswerFromGPT)));// Остальные сообщения из чата
         messages.Add(new ChatGpt.Message(Settings.CharacterConfiguration.LastMessageCondition, false));// Последнее сообщение, наставляющее на ответ
         var result = new RequestBody
         {
@@ -107,10 +112,11 @@ public static class Context
         if (!m.IsAnswerFromGPT)
         {
             var messagePerson = FindPersonBySpeakerId(m.SpeakerId);
-            if (messagePerson != null)
-                result = messagePerson.SpeakerName + " пишет: " + result;
+            string speakerName = messagePerson != null ? messagePerson.SpeakerName : "Кто-то";
+            if (!string.IsNullOrEmpty(m.ForwardedFrom))
+                result = messagePerson.SpeakerName + " переслал сообщение от " + m.ForwardedFrom + ": " + result;
             else
-                result = "Кто-то пишет: " + result;
+                result = messagePerson.SpeakerName + " пишет: " + result;
         }
         return result;
     }
@@ -126,7 +132,38 @@ public static class Context
             foreach (var p in Persons)
                 charactersDesciption += " " + p.SpeakerId.ToString() + ". " + p.IntroDescription;
         }
+        charactersDesciption += " Now " + DateTime.Now.Date.ToLongDateString() + " " + DateTime.Now.ToShortTimeString();
 
         return result.Replace("%CharacterDescription%", charactersDesciption);
+    }
+
+    private static string GetTextFromAnyTypeMessage(Telegram.Bot.Types.Message msg)
+    {
+        if (msg.Type == Telegram.Bot.Types.Enums.MessageType.Text && !string.IsNullOrEmpty(msg.Text))
+            return msg.Text;
+        else if (!string.IsNullOrEmpty(msg.Caption))
+            return msg.Caption;
+        else
+            return "";
+    }
+
+    private static string GetFromTitleForForwardedMessage(Telegram.Bot.Types.Message msg)
+    {
+        if (msg.ForwardFromChat != null)
+        {
+            if (!string.IsNullOrEmpty(msg.ForwardFromChat.Title))
+                return msg.ForwardFromChat.Title;
+            else if (!string.IsNullOrEmpty(msg.ForwardFromChat.Username))
+                return msg.ForwardFromChat.Username;
+        }
+        else if (msg.ForwardFrom != null)
+        {
+            if (!string.IsNullOrEmpty(msg.ForwardFrom.Username))
+                return msg.ForwardFrom.Username;
+            else if (!string.IsNullOrEmpty(msg.ForwardFrom.LastName))
+                return msg.ForwardFrom.LastName;
+        }
+
+        return "";
     }
 }

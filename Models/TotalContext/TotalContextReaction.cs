@@ -35,23 +35,20 @@ public class TotalContextReaction : ReactionBase
 
     public override bool CheckNeedReactionForMessage(Message msg)
     {
-        if (msg.Type == MessageType.Text && !string.IsNullOrWhiteSpace(msg.Text))
+        Context.AddMessage(msg);
+
+        if (msg.IsItReplyToBotMessage())
+            return true;
+
+        if (msg.Text.Length < 512)
         {
-            Context.AddMessage(msg);
-
-            if (msg.IsItReplyToBotMessage())
-                return true;
-
-            if (msg.Text.Length < 512)
+            foreach (var substring in Substrings)
             {
-                foreach (var substring in Substrings)
+                if (msg.Text.StartsWith(substring))
                 {
-                    if (msg.Text.StartsWith(substring))
-                    {
-                        var question = msg.Text.RemoveFirstOccurrence(substring);
-                        if (question.Length >= 6)
-                            return true;
-                    }
+                    var question = msg.Text.RemoveFirstOccurrence(substring);
+                    if (question.Length >= 6)
+                        return true;
                 }
             }
         }

@@ -6,6 +6,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using NotAPidorBot.Models.TotalContext;
 
 namespace NotAPidorBot.Models.SimpleReactions;
 public class ForPidorsReaction : ReactionBase
@@ -85,7 +86,11 @@ public class ForPidorsReaction : ReactionBase
             int randomReplyIndex = random.Next(Replies.Length);
             var reply = Replies[randomReplyIndex];
             if (reply.Type == MessageType.Text)
-                return await bot.SendReplyTextAsync(logger, msg, String.Format("{0} {1}", _wordForPidors, reply.Text));
+            {
+                var result = await bot.SendReplyTextAsync(logger, msg, String.Format("{0} {1}", _wordForPidors, reply.Text));
+                Context.AddAnswerFromGpt(result.MessageId, reply.Text);
+                return result;
+            }
             if (reply.Type == MessageType.Sticker)
                 return await bot.SendReplyStickerAsync(logger, msg, reply.Text);
             else

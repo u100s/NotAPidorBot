@@ -2,14 +2,16 @@
 using Telegram.Bot;
 using NotAPidorBot;
 using NotAPidorBot.Services;
+using NotAPidorBot.Configurations;
 
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
-        // Register Bot configuration
+        // Register Bot configurations
         services.Configure<BotConfiguration>(context.Configuration.GetSection("BotConfiguration"));
         services.Configure<CharacterConfiguration>(context.Configuration.GetSection("CharacterConfiguration"));
+        services.Configure<ContextConfiguration>(context.Configuration.GetSection("ContextConfiguration"));
 
         // Register named HttpClient to benefits from IHttpClientFactory
         // and consume it with ITelegramBotClient typed client.
@@ -21,9 +23,11 @@ IHost host = Host.CreateDefaultBuilder(args)
                 {
                     BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
                     CharacterConfiguration? characterConfiguration = sp.GetService<IOptions<CharacterConfiguration>>()?.Value;
+                    ContextConfiguration? contextConfiguration = sp.GetService<IOptions<ContextConfiguration>>()?.Value;
                     ArgumentNullException.ThrowIfNull(botConfiguration);
                     ArgumentNullException.ThrowIfNull(characterConfiguration);
-                    Settings.Init(botConfiguration, characterConfiguration);
+                    ArgumentNullException.ThrowIfNull(contextConfiguration);
+                    Settings.Init(botConfiguration, characterConfiguration, contextConfiguration);
                     TelegramBotClientOptions options = new(botConfiguration.BotToken);
                     return new TelegramBotClient(options, httpClient);
                 });

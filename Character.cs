@@ -19,7 +19,7 @@ public class Character
         {
             UserId = userId,
             UserLogin = login,
-            Names = ["дружище"],
+            Names = ["дружище", "брат", "братан", "братишка", "чувак"],
             CharacterDescription = "%username%, один из твоих знакомых в чате, но близко ты его не знаешь."
         };
         ;

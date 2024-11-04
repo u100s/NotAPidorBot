@@ -8,9 +8,9 @@ public class TotalContextReaction : ReactionBase
 {
     private string[] _substrings = new[]
     {
-        "бот, ",
-        "Бот, ",
-        "БОТ, ",
+        "бот,",
+        "Бот,",
+        "БОТ,",
         "Бот ",
         "бот ",
         " бот, "

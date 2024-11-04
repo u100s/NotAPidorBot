@@ -1,18 +1,21 @@
 namespace NotAPidorBot;
+using NotAPidorBot.Configurations;
 public static class Settings
 {
     public static BotConfiguration BotConfiguration { get; private set; }
 
     public static CharacterConfiguration CharacterConfiguration { get; private set; }
 
-    public static void Init(BotConfiguration botConfiguration, CharacterConfiguration characterConfiguration)
+    public static ContextConfiguration ContextConfiguration { get; private set; }
+
+    public static void Init(BotConfiguration botConfiguration, CharacterConfiguration characterConfiguration, ContextConfiguration contextConfiguration)
     {
-        if (botConfiguration is null)
-            throw new ArgumentNullException(nameof(botConfiguration), "Parameter cannot be null.");
-        if (characterConfiguration is null)
-            throw new ArgumentNullException(nameof(characterConfiguration), "Parameter cannot be null.");
+        ArgumentNullException.ThrowIfNull(botConfiguration);
+        ArgumentNullException.ThrowIfNull(characterConfiguration);
+        ArgumentNullException.ThrowIfNull(contextConfiguration);
 
         BotConfiguration = botConfiguration;
         CharacterConfiguration = characterConfiguration;
+        ContextConfiguration = contextConfiguration;
     }
 }

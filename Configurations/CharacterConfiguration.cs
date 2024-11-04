@@ -1,4 +1,4 @@
-namespace NotAPidorBot;
+namespace NotAPidorBot.Configurations;
 public class CharacterConfiguration
 {
     public string InitialMessage { get; set; }

@@ -1,3 +1,6 @@
+using NotAPidorBot.Characters;
+
+
 namespace NotAPidorBot.Configurations;
 public class CharacterConfiguration
 {

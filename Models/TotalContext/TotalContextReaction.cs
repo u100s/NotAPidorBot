@@ -2,6 +2,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using NotAPidorBot.Helpers;
+using NotAPidorBot.Characters;
 
 namespace NotAPidorBot.Models.TotalContext;
 public class TotalContextReaction : ReactionBase
@@ -67,7 +68,7 @@ public class TotalContextReaction : ReactionBase
             var client = new ChatGpt.Client(Settings.BotConfiguration.ChatGptApiKey);
             await bot.SendChatActionAsync(msg.Chat, ChatAction.Typing);
             string response = await client.SendMessagesContextAsync(Context.CreateGptRequestBody());
-            string replyText = Context.ReplaceUserNamesByRealNames(response);
+            string replyText = CharacterHelper.DeanonimyzeText(response);
             var replyMessage = await bot.SendReplyTextAsync(logger, msg, replyText);
             Context.AddAnswerFromGpt(replyMessage.MessageId, response);
             return replyMessage;

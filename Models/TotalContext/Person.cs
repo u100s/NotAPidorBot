@@ -1,7 +1,4 @@
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types;
-using Telegram.Bot;
-using NotAPidorBot.Helpers;
+using NotAPidorBot.Characters;
 
 namespace NotAPidorBot.Models.TotalContext;
 public class Person

@@ -1,9 +1,10 @@
-namespace NotAPidorBot;
+namespace NotAPidorBot.Characters;
 public class Character
 {
     public long UserId { get; set; }
     public string? UserLogin { get; set; }
     public string[] Names { get; set; }
+    public string[] SecondFormNames { get; set; }
     public string CharacterDescription { get; set; }
 
     public string GetRandomCharacterName()
@@ -22,6 +23,5 @@ public class Character
             Names = ["дружище", "брат", "братан", "братишка", "чувак"],
             CharacterDescription = "%username%, один из твоих знакомых в чате, но близко ты его не знаешь."
         };
-        ;
     }
 }

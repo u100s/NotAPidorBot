@@ -76,50 +76,26 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
             return;
         }
 
-        Message sentMessage = null;
 
-        // Инициализируем массив подстрок и соответствующих методов
-        // Заданное пространство имен
-        string targetNamespace = "NotAPidorBot.Models";
-
-        // Получаем все типы в текущей сборке
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        Type[] types = assembly.GetTypes();
-
-        // Список для хранения экземпляров классов
-        List<ReactionBase> reactions = new List<ReactionBase>();
-
-        // Проходим по всем типам и ищем классы, наследующие ReactionBase
-        foreach (Type type in types)
-        {
-            if (!String.IsNullOrEmpty(type.Namespace)
-                && type.Namespace.Contains(targetNamespace)
-                && type.IsClass
-                && !type.IsAbstract
-                && type.IsSubclassOf(typeof(ReactionBase)))
-            {
-                // Создаем экземпляр класса и добавляем его в список
-                ReactionBase instance = (ReactionBase)Activator.CreateInstance(type);
-                reactions.Add(instance);
-            }
-        }
+        // Список реакций
+        List<ReactionBase> reactions = GetReactionsList();
 
         // Работаем по реакциям
         foreach (var reaction in reactions)
         {
             if (reaction.CheckNeedReactionForMessage(msg))
             {
-                sentMessage = await reaction.SendAsync(bot, logger, msg);
+                Message sentMessage = await reaction.SendAsync(bot, logger, msg);
+
+                if (sentMessage != null)
+                {
+                    if (sentMessage.Type == MessageType.Text)
+                        logger.LogInformation("Я ответил: {MessageText}", sentMessage.Text);
+                    if (sentMessage.Type == MessageType.Sticker)
+                        logger.LogInformation("Я ответил: {MessageText}", sentMessage.Type);
+                }
                 break; // Прекращаем поиск после первого найденного совпадения
             }
-        }
-
-        if (sentMessage != null)
-        {
-            if (sentMessage.Type == MessageType.Text)
-                logger.LogInformation("Я ответил: {MessageText}", sentMessage.Text);
-            if (sentMessage.Type == MessageType.Sticker)
-                logger.LogInformation("Я ответил: {MessageText}", sentMessage.Type);
         }
     }
 
@@ -127,7 +103,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
     {
         logger.LogInformation("В чате '{ChatUsername}' {Username} редактирует сообщение: {MessageText}", msg.Chat.Title, msg.From.Username, msg.Text);
     }
-
 
     private async Task OnCreatorMessage(Message msg)
     {
@@ -139,8 +114,33 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
         }
     }
 
+    private List<ReactionBase> GetReactionsList()
+    {
+        string targetNamespace = "NotAPidorBot.Models";
 
+        // Получаем все типы в текущей сборке
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        Type[] types = assembly.GetTypes();
 
+        List<ReactionBase> result = new List<ReactionBase>();
+
+        // Проходим по всем типам и ищем классы, наследующие ReactionBase
+        foreach (Type type in types)
+        {
+            if (!String.IsNullOrEmpty(type.Namespace)
+                && type.Namespace.Contains(targetNamespace)
+                && type.IsClass
+                && !type.IsAbstract
+                && type.IsSubclassOf(typeof(ReactionBase)))
+            {
+                // Создаем экземпляр класса и добавляем его в список
+                ReactionBase? instance = (ReactionBase)Activator.CreateInstance(type);
+                if (instance != null)
+                    result.Add(instance);
+            }
+        }
+        return result;
+    }
 
 
     async Task<Message> Usage(Message msg)

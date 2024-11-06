@@ -75,7 +75,7 @@ public class TotalContextReaction : ReactionBase
         }
         catch (Exception ex)
         {
-            return await bot.SendReplyTextAsync(logger, msg, "Бля, чёт я перебрал с программированием и мерещится мне json: " + ex.Message);
+            return await bot.SendReplyTextAsync(logger, msg, "Бля, чёт я перебрал с программированием и мерещится мне: " + ex.Message + ", StackTrace: " + ex.StackTrace);
         }
     }
 }

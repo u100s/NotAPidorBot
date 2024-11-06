@@ -13,19 +13,24 @@ public static class CharacterHelper
             {
                 textToAnonimyze = Regex.Replace(textToAnonimyze, "@" + p.Character.UserLogin, p.SpeakerName, RegexOptions.IgnoreCase);
             }
-            foreach (var name in p.Character.Names)
+            if (p.Character != null)
             {
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    textToAnonimyze = Regex.Replace(textToAnonimyze, name, p.SpeakerName, RegexOptions.IgnoreCase);
-                }
-            }
-            foreach (var name in p.Character.SecondFormNames)
-            {
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    textToAnonimyze = Regex.Replace(textToAnonimyze, name, p.SpeakerName, RegexOptions.IgnoreCase);
-                }
+                if (p.Character.Names != null)
+                    foreach (var name in p.Character.Names)
+                    {
+                        if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            textToAnonimyze = Regex.Replace(textToAnonimyze, name, p.SpeakerName, RegexOptions.IgnoreCase);
+                        }
+                    }
+                if (p.Character.SecondFormNames != null)
+                    foreach (var name in p.Character.SecondFormNames)
+                    {
+                        if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            textToAnonimyze = Regex.Replace(textToAnonimyze, name, p.SpeakerName, RegexOptions.IgnoreCase);
+                        }
+                    }
             }
         }
         return textToAnonimyze;

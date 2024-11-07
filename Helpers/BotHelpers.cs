@@ -11,6 +11,10 @@ namespace NotAPidorBot.Helpers;
 
 public static class BotHelpers
 {
+    public static async Task<Message> SendTextAsync(this ITelegramBotClient bot, ILogger logger, Chat chat, string text)
+    {
+        return await bot.SendTextMessageAsync(chat, text, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
+    }
     public static async Task<Message> SendReplyTextAsync(this ITelegramBotClient bot, ILogger logger, Message msg, string text)
     {
         return await bot.SendTextMessageAsync(msg.Chat, text, parseMode: ParseMode.Html, replyParameters: new ReplyParameters() { MessageId = msg.MessageId }, replyMarkup: new ReplyKeyboardRemove());

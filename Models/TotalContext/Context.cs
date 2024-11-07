@@ -132,7 +132,7 @@ public static class Context
         return "";
     }
 
-    private static string PrepareMessageTextToSendToGpt(ChatMessage m)
+    public static string PrepareMessageTextToSendToGpt(ChatMessage m)
     {
         string result = m.Text.AnonimyzeText();
 

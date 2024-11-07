@@ -8,6 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using NotAPidorBot.Helpers;
 using NotAPidorBot.Models;
 using System.Reflection;
+using NotAPidorBot.Models.AdminCommands;
 
 namespace NotAPidorBot.Services;
 
@@ -47,7 +48,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
         if (Settings.BotConfiguration.AdminIds.Contains(msg.From.Id) && msg.Chat.Type == ChatType.Private)
         {
-            await OnCreatorMessage(msg);
+            await OnAdminMessage(msg);
             return;
         }
 
@@ -78,7 +79,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
 
         // Список реакций
-        List<ReactionBase> reactions = GetReactionsList();
+        List<ReactionBase> reactions = GetReactionsList("NotAPidorBot.Models");
 
         // Работаем по реакциям
         foreach (var reaction in reactions)
@@ -104,20 +105,23 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
         logger.LogInformation("В чате '{ChatUsername}' {Username} редактирует сообщение: {MessageText}", msg.Chat.Title, msg.From.Username, msg.Text);
     }
 
-    private async Task OnCreatorMessage(Message msg)
+    private async Task OnAdminMessage(Message msg)
     {
-        switch (msg.Type)
+        var commands = GetReactionsList("NotAPidorBot.Models.AdminCommands");
+
+        // Работаем по реакциям
+        foreach (var command in commands)
         {
-            case MessageType.Sticker:
-                await bot.SendTextMessageAsync(msg.Chat, msg.Type.ToString() + ' ' + msg.Sticker.FileId, parseMode: ParseMode.Html, replyParameters: new ReplyParameters() { MessageId = msg.MessageId }, replyMarkup: new ReplyKeyboardRemove());
-                break;
+            if (command.CheckNeedReactionForMessage(msg))
+            {
+                Message sentMessage = await command.SendAsync(bot, logger, msg);
+                break; // Прекращаем поиск после первого найденного совпадения
+            }
         }
     }
 
-    private List<ReactionBase> GetReactionsList()
+    private List<ReactionBase> GetReactionsList(string targetNamespace)
     {
-        string targetNamespace = "NotAPidorBot.Models";
-
         // Получаем все типы в текущей сборке
         Assembly assembly = Assembly.GetExecutingAssembly();
         Type[] types = assembly.GetTypes();

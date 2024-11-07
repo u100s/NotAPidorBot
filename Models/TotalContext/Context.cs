@@ -12,7 +12,7 @@ public static class Context
     public static DateTime Created { get; private set; } = DateTime.Now;
     public static List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 
-    private static string RetellingText { get; set; } = "";
+    public static string RetellingText { get; private set; } = "";
 
 
     public static void AddMessage(Telegram.Bot.Types.Message msg)

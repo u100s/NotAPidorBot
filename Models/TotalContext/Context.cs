@@ -21,7 +21,8 @@ public static class Context
         string messageText = GetTextFromAnyTypeMessage(msg);
         if (!string.IsNullOrWhiteSpace(messageText) && msg.From != null)
         {
-            var person = PersonsStore.GetOrCreatePersonByUser(msg.From.Id, msg.From.Username);
+            var username = !string.IsNullOrEmpty(msg.From.Username) ? msg.From.Username : string.Format("{0} {1}", msg.From.LastName, msg.From.FirstName);
+            var person = PersonsStore.GetOrCreatePersonByUser(msg.From.Id, username);
             var forwardedFromName = GetFromTitleForForwardedMessage(msg);
             Messages.Add(new ChatMessage(person.SpeakerId, msg.MessageId, messageText, false, forwardedFromName));
         }

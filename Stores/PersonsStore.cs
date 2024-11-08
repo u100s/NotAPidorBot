@@ -18,7 +18,7 @@ public static class PersonsStore
             var character = Settings.CharacterConfiguration.GetCharacterByUserId(userId);
             if (character == null)
                 character = Character.CreateAnonimousCharacterByUserId(userId, username);
-            result = new Person(PersonsStore.Persons.Count + 1, userId, character);
+            result = new Person(PersonsStore.Persons.Count + 1, userId, username, character);
             PersonsStore.Persons.Add(result);
         }
         return result;

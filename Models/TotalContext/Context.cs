@@ -62,7 +62,7 @@ public static class Context
             try
             {
                 var client = new ChatGpt.Client(Settings.BotConfiguration.ChatGptApiKey);
-                string response = await client.SendMessagesContextAsync(requestBody);
+                RetellingText = await client.SendMessagesContextAsync(requestBody);
             }
             catch (Exception ex)
             {

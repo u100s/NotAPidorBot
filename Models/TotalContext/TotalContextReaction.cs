@@ -41,13 +41,15 @@ public class TotalContextReaction : ReactionBase
         if (msg.IsItReplyToBotMessage())
             return true;
 
-        if (msg.Text.Length < 512)
+        var text = !string.IsNullOrEmpty(msg.Text) ? msg.Text : !string.IsNullOrEmpty(msg.Caption) ? msg.Caption : "";
+
+        if (text.Length < 1024 && text.Length > 1)
         {
             foreach (var substring in Substrings)
             {
-                if (msg.Text.StartsWith(substring))
+                if (text.StartsWith(substring))
                 {
-                    var question = msg.Text.RemoveFirstOccurrence(substring);
+                    var question = text.RemoveFirstOccurrence(substring);
                     if (question.Length >= 6)
                         return true;
                 }

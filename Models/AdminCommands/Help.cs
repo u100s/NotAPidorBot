@@ -5,16 +5,20 @@ using Telegram.Bot.Types.Enums;
 using NotAPidorBot.Models.TotalContext;
 
 namespace NotAPidorBot.Models.AdminCommands;
-public class GetRetellingText : AdminCommandBase
+public class Help : AdminCommandBase
 {
-    private string commandName = "/getretelling";
+    private string commandName = "/help";
     public override string CommandName { get { return commandName; } }
 
     public override async Task<Message> SendAsync(ITelegramBotClient bot, ILogger logger, Message msg)
     {
-        if (!string.IsNullOrWhiteSpace(Context.RetellingText))
-            return await bot.SendReplyTextAsync(logger, msg, Context.RetellingText);
-        else
-            return await bot.SendReplyTextAsync(logger, msg, "Пусто");
+        var commands = ReactionHelper.GetAdminReactionsList();
+        string message = "";
+        foreach (var command in commands)
+            message += command.CommandName + Environment.NewLine;
+
+        await bot.SendReplyTextAsync(logger, msg, message.TrimEnd());
+
+        return null;
     }
 }

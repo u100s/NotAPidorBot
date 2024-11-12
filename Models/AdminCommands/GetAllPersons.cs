@@ -8,15 +8,8 @@ using NotAPidorBot.Stores;
 namespace NotAPidorBot.Models.AdminCommands;
 public class GetAllPersons : AdminCommandBase
 {
-    public override bool CheckNeedReactionForMessage(Message msg)
-    {
-        if (msg.From != null && Settings.BotConfiguration.AdminIds.Contains(msg.From.Id) && msg.Chat.Type == ChatType.Private)
-        {
-            if (!string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Trim().ToLower() == "/getallpersons")
-                return true;
-        }
-        return false;
-    }
+    private string commandName = "/getallpersons";
+    public override string CommandName { get { return commandName; } }
 
     public override async Task<Message> SendAsync(ITelegramBotClient bot, ILogger logger, Message msg)
     {

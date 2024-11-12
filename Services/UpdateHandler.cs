@@ -79,7 +79,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
 
         // Список реакций
-        List<ReactionBase> reactions = GetReactionsList("NotAPidorBot.Models");
+        List<ReactionBase> reactions = ReactionHelper.GetReactionsList("NotAPidorBot.Models");
 
         // Работаем по реакциям
         foreach (var reaction in reactions)
@@ -107,7 +107,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
 
     private async Task OnAdminMessage(Message msg)
     {
-        var commands = GetReactionsList("NotAPidorBot.Models.AdminCommands");
+        var commands = ReactionHelper.GetReactionsList("NotAPidorBot.Models.AdminCommands");
 
         // Работаем по реакциям
         foreach (var command in commands)
@@ -118,32 +118,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger
                 break; // Прекращаем поиск после первого найденного совпадения
             }
         }
-    }
-
-    private List<ReactionBase> GetReactionsList(string targetNamespace)
-    {
-        // Получаем все типы в текущей сборке
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        Type[] types = assembly.GetTypes();
-
-        List<ReactionBase> result = new List<ReactionBase>();
-
-        // Проходим по всем типам и ищем классы, наследующие ReactionBase
-        foreach (Type type in types)
-        {
-            if (!String.IsNullOrEmpty(type.Namespace)
-                && type.Namespace.Contains(targetNamespace)
-                && type.IsClass
-                && !type.IsAbstract
-                && type.IsSubclassOf(typeof(ReactionBase)))
-            {
-                // Создаем экземпляр класса и добавляем его в список
-                ReactionBase? instance = (ReactionBase)Activator.CreateInstance(type);
-                if (instance != null)
-                    result.Add(instance);
-            }
-        }
-        return result;
     }
 
 

@@ -6,6 +6,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace NotAPidorBot.Models.AdminCommands;
 public class GetStickerId : AdminCommandBase
 {
+    private string commandName = "/getstickerid";
+    public override string CommandName { get { return commandName; } }
     public override bool CheckNeedReactionForMessage(Message msg)
     {
         var result = base.CheckNeedReactionForMessage(msg);

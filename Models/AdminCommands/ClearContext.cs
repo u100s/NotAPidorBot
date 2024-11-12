@@ -7,15 +7,8 @@ using NotAPidorBot.Models.TotalContext;
 namespace NotAPidorBot.Models.AdminCommands;
 public class ClearContext : AdminCommandBase
 {
-    public override bool CheckNeedReactionForMessage(Message msg)
-    {
-        if (msg.From != null && Settings.BotConfiguration.AdminIds.Contains(msg.From.Id) && msg.Chat.Type == ChatType.Private)
-        {
-            if (!string.IsNullOrWhiteSpace(msg.Text) && msg.Text.Trim().ToLower() == "/clearcontext")
-                return true;
-        }
-        return false;
-    }
+    private string commandName = "/clearcontext";
+    public override string CommandName { get { return commandName; } }
 
     public override async Task<Message> SendAsync(ITelegramBotClient bot, ILogger logger, Message msg)
     {
